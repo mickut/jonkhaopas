@@ -1,0 +1,18 @@
+node_modules/
+dist/
+dist-ssr/
+*.local
+*.log
+
+# Raw GTFS feed (see .github/skills/gtfs-hsl-data) — large (stop_times.txt ~873MB), not shipped
+# to the client, and not worth tracking in git; re-download from HSL's open data portal instead.
+/data/hsl/
+
+# Editor directories and files
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

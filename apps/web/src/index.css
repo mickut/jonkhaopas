@@ -1,0 +1,67 @@
+:root {
+  color-scheme: dark;
+  font:
+    16px/1.4 system-ui,
+    "Segoe UI",
+    Roboto,
+    sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  background: #0b0d10;
+}
+
+.app-shell,
+.map-frame {
+  position: fixed;
+  inset: 0;
+}
+
+.map-frame .map-container {
+  width: 100%;
+  height: 100%;
+}
+
+.map-frame .map-container.maplibregl-map {
+  width: 100%;
+  height: 100%;
+}
+
+.location-pin {
+  width: 18px;
+  height: 18px;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+  background: #4fc3f7;
+  border: 2px solid #0b0d10;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  cursor: grab;
+}
+
+.work-pin {
+  background: #4fc3f7;
+}
+
+.evening-pin {
+  background: #d9a441;
+}
+
+.weekend-pin {
+  background: #d66ba0;
+}
+
+.maplibregl-popup .maplibregl-popup-content {
+  color: #18212a !important;
+  font-weight: 600;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

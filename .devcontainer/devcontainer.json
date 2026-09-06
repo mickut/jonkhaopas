@@ -1,0 +1,24 @@
+{
+  "name": "jonkhaopas",
+  "image": "mcr.microsoft.com/devcontainers/base:bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": { "version": "24" }
+  },
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+  "forwardPorts": [5173],
+  "appPort": ["5173:5173"],
+  "portsAttributes": {
+    "5173": {
+      "label": "apps/web (Vite dev server)",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "postCreateCommand": "npm install --prefix apps/web && npm install --prefix tools/gtfs-pipeline",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint", "esbenp.prettier-vscode"]
+    }
+  },
+  "remoteUser": "vscode"
+}

@@ -1,0 +1,21 @@
+Attribution 4.0 International (CC BY 4.0)
+
+Copyright (c) 2026 Antti Kuntsi
+
+This work (application source code, generated artifacts, and documentation in this repository,
+excluding third-party data in `data/`) is licensed under the Creative Commons Attribution 4.0
+International License. To view a copy of this license, visit
+<https://creativecommons.org/licenses/by/4.0/>
+
+You are free to:
+
+- Share — copy and redistribute the material in any medium or format
+- Adapt — remix, transform, and build upon the material
+for any purpose, even commercially, under the following terms:
+- Attribution — You must give appropriate credit, provide a link to the license, and indicate if
+  changes were made.
+
+Third-party data notice: GTFS transit data in `data/hsl/` is provided by HSL
+(<https://www.hsl.fi/hsl/avoin-data>) under CC BY 4.0. Map tiles/styles are derived from
+OpenStreetMap contributors / OpenFreeMap, also CC BY / ODbL as applicable — see their respective
+licenses. Attribute both HSL and OpenStreetMap when using or redistributing this app.

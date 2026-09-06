@@ -1,0 +1,59 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: Start Vite",
+      "type": "shell",
+      "command": "devcontainer exec --workspace-folder ${workspaceFolder} -- bash -lc 'fuser -k 5173/tcp >/dev/null 2>&1; rm -rf apps/web/node_modules/.vite; npm --prefix apps/web run dev -- --host 0.0.0.0 --port 5173 --strictPort'",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": ".*"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE v",
+          "endsPattern": "Local:.*5173"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "revealProblems": "onProblem"
+      }
+    },
+    {
+      "label": "Dev: Stop Vite",
+      "type": "shell",
+      "command": "devcontainer exec --workspace-folder ${workspaceFolder} -- bash -lc 'fuser -k 5173/tcp >/dev/null 2>&1; exit 0'",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    },
+    {
+      "label": "Dev: Restart Vite",
+      "type": "shell",
+      "command": "devcontainer exec --workspace-folder ${workspaceFolder} -- bash -lc 'fuser -k 5173/tcp >/dev/null 2>&1; rm -rf apps/web/node_modules/.vite; npm --prefix apps/web run dev -- --host 0.0.0.0 --port 5173 --strictPort'",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "vite",
+        "pattern": {
+          "regexp": ".*"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "VITE v",
+          "endsPattern": "Local:.*5173"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "revealProblems": "onProblem"
+      }
+    }
+  ]
+}
