@@ -1,14 +1,18 @@
 import * as h3 from "h3-js";
 import type { GridCell } from "../data/types.js";
 
-/** Normalized score ramp: better is green, worse is red, unreachable is purple. */
+/** Normalized score ramp: a narrow blue band marks the very best cells, then green through
+ * yellow/orange/red as things get worse, then purple fading to dark grey for the effectively
+ * unreachable tail (rather than staying vividly purple all the way to the worst score). */
 export const SCORE_COLOR_STOPS: [number, string][] = [
-  [0, "#1a9850"],
-  [0.3, "#a6d96a"],
-  [0.5, "#fdae61"],
-  [0.7, "#d73027"],
-  [0.85, "#762a83"],
-  [1, "#542788"],
+  [0, "#2166ac"],
+  [0.06, "#1a9850"],
+  [0.24, "#66bd63"],
+  [0.4, "#fee08b"],
+  [0.56, "#fdae61"],
+  [0.72, "#d73027"],
+  [0.88, "#762a83"],
+  [1, "#3f3f46"],
 ];
 
 const DISPLAY_SCORE_MIN = 2;

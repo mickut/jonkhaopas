@@ -9,10 +9,14 @@
   border-radius: 4px;
   background: linear-gradient(
     90deg,
-    #1a9850 0%,
-    #fdae61 45%,
-    #d73027 70%,
-    #542788 100%
+    #2166ac 0%,
+    #1a9850 6%,
+    #66bd63 24%,
+    #fee08b 40%,
+    #fdae61 56%,
+    #d73027 72%,
+    #762a83 88%,
+    #3f3f46 100%
   );
 }
 
