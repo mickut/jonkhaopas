@@ -1,9 +1,9 @@
-// Excludes grid cells whose center is open sea, per OpenFreeMap's own "water" vector-tile layer
+// Excludes grid cells fully submerged in water, per OpenFreeMap's own "water" vector-tile layer
 // — the same OpenMapTiles-schema data already rendering the (verifiably accurate, down to
 // individual archipelago skerries) basemap coastline. A coarser dataset like Natural Earth's
 // public-domain land polygons was tried first, but at continental-scale generalization it drops
 // most of Helsinki's small skerries entirely, so it couldn't tell real land from open sea here.
-// Only the "ocean" class is kept as exclusion-worthy water — see WaterIndex.load below.
+// Only "ocean" and "lake" classes count — see WaterIndex.load below.
 import { VectorTile } from "@mapbox/vector-tile";
 import { PbfReader } from "pbf";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -116,10 +116,11 @@ export class WaterIndex {
       const polygons: PolygonWithHoles[] = [];
       for (let i = 0; i < layer.length; i++) {
         const rawFeature = layer.feature(i);
-        // Only "ocean" (OpenMapTiles' class for real sea/coastal water) excludes a cell — small
-        // inland water (river/pond/lake/dock/swimming_pool) shouldn't punch a hole in an
-        // otherwise well-connected block; walking around a pond is trivial, unlike open sea.
-        if (rawFeature.properties["class"] !== "ocean") continue;
+        // "ocean" and "lake" (OpenMapTiles classes for real, non-trivial-to-walk-around water)
+        // are exclusion-worthy — small inland water (river/pond/dock/swimming_pool) shouldn't
+        // punch a hole in an otherwise well-connected block; walking around a pond is trivial.
+        const waterClass = rawFeature.properties["class"];
+        if (waterClass !== "ocean" && waterClass !== "lake") continue;
         const feature = rawFeature.toGeoJSON(x, y, ZOOM);
         const geometry = feature.geometry;
         if (geometry.type === "Polygon") {
@@ -147,6 +148,12 @@ export class WaterIndex {
       return true;
     }
     return false;
+  }
+
+  /** True only if EVERY given [lat, lon] point is water — a cell that's merely touching the
+   * coast (some points on land) stays included, since it's not actually unreachable by foot. */
+  isFullyInWater(points: [number, number][]): boolean {
+    return points.every(([lat, lon]) => this.isWater(lat!, lon!));
   }
 }
 

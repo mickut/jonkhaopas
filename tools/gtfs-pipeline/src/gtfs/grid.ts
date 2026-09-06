@@ -2,7 +2,9 @@ import * as h3 from "h3-js";
 import type { Bbox } from "./stops.js";
 import { PROFILES } from "./headways.js";
 
-export type WaterIndex = { isWater(lat: number, lon: number): boolean };
+export type WaterIndex = {
+  isFullyInWater(points: [number, number][]): boolean;
+};
 
 const TARGET_EDGE_METERS = 250;
 /** Hard cap on total cell count so grid.json stays a "low single-digit MB" client fetch. */
@@ -188,10 +190,15 @@ export function buildGrid(
   const cells: GridCell[] = [];
   for (const cell of h3cells) {
     const [lat, lon] = h3.cellToLatLng(cell);
-    // A cell that's literally open water is never worth scoring, no matter how close a stop is —
-    // swimming isn't a transport strategy. Checked first since it's the cheapest test and rules
-    // out most of the raw bbox rectangle's open-sea area up front (see stops.ts computeBbox).
-    if (waterIndex?.isWater(lat, lon)) continue;
+    // A cell that's ENTIRELY open water (center + every hexagon vertex) is never worth scoring,
+    // no matter how close a stop is — swimming isn't a transport strategy. A cell merely touching
+    // the coast (some vertices on land) stays included, since it's genuinely reachable on foot,
+    // especially if a land-connected stop is nearby. Checked first since it's the cheapest test
+    // and rules out most of the raw bbox rectangle's open-sea area up front (see stops.ts
+    // computeBbox).
+    if (waterIndex?.isFullyInWater([[lat, lon], ...h3.cellToBoundary(cell)])) {
+      continue;
+    }
     const pool = index.nearby(lat, lon, MAX_WALK_KM, CANDIDATE_POOL_SIZE);
     // Ship the cell even with an empty candidate list (e.g. a land cell between the nearest
     // walkable stop and an outer island) — the frontend's cost.ts walks further to reach real

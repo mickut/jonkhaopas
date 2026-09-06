@@ -65,16 +65,28 @@ test("buildGrid excludes cells far out in open sea even when the raw bbox extend
   );
 });
 
-test("buildGrid excludes a cell that a WaterIndex reports as open water, even right next to a stop", () => {
+test("buildGrid excludes a cell fully reported as water, even right next to a stop", () => {
   const stops: GridStop[] = [
     { id: "near", lat: 60.17, lon: 24.94, headway: [5, 5, 5] },
   ];
-  const allWater = { isWater: () => true };
+  const allWater = { isFullyInWater: () => true };
   const { cells } = buildGrid(tinyBbox, stops, allWater);
   assert.equal(
     cells.length,
     0,
-    "swimming isn't a transport strategy — no cell should ship if it's water, regardless of nearby service",
+    "swimming isn't a transport strategy — no cell should ship if it's fully water, regardless of nearby service",
+  );
+});
+
+test("buildGrid keeps a cell only partially in water (e.g. touching the coast)", () => {
+  const stops: GridStop[] = [
+    { id: "near", lat: 60.17, lon: 24.94, headway: [5, 5, 5] },
+  ];
+  const partiallyWater = { isFullyInWater: () => false };
+  const { cells } = buildGrid(tinyBbox, stops, partiallyWater);
+  assert.ok(
+    cells.length > 0,
+    "a cell that's only partly water (not fully submerged) should still ship",
   );
 });
 
