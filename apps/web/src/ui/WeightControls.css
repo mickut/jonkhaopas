@@ -15,7 +15,13 @@
   left: 12px;
   width: 270px;
   max-height: calc(100vh - 32px);
+  display: flex;
+  flex-direction: column;
+}
+
+.weight-controls-scroll {
   overflow-y: auto;
+  min-height: 0;
 }
 
 .weight-controls h2 {

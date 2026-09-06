@@ -42,60 +42,62 @@ export function WeightControls({
         <h2>Jonkhaopas</h2>
         <AboutInfo />
       </div>
-      <p className="hint">
-        Choose a category, then click the map to add its destinations. Drag a
-        pin to move it.
-      </p>
-      <div className="profile-tabs" aria-label="Destination category">
-        {PROFILES.map((profile) => (
-          <button
-            key={profile}
-            type="button"
-            className={profile === activeProfile ? "active" : ""}
-            onClick={() => onActiveProfileChange(profile)}
-          >
-            <span className="profile-name">
-              <span
-                className={`location-swatch ${PROFILE_SWATCHES[profile]}`}
-                aria-hidden="true"
-              />
-              {PROFILE_LABELS[profile]}
-            </span>
-            <span>{locations[profile].length}</span>
-          </button>
-        ))}
-      </div>
-      <p className="category-limit">
-        {locations[activeProfile].length}/{maxLocations}{" "}
-        {PROFILE_LABELS[activeProfile].toLowerCase()} destinations
-      </p>
-      {PROFILES.some((profile) => locations[profile].length === 0) && (
-        <p className="calculation-hint">
-          Add one destination to each category to calculate the heatmap.
+      <div className="weight-controls-scroll">
+        <p className="hint">
+          Choose a category, then click the map to add its destinations. Drag a
+          pin to move it.
         </p>
-      )}
-      <div className="location-list">
-        {locations[activeProfile].map((location, index) => (
-          <div key={`${activeProfile}-${index}`} className="location-row">
-            <span className="location-name">
-              <span
-                className={`location-swatch ${PROFILE_SWATCHES[activeProfile]}`}
-                aria-hidden="true"
-              />
-              {PROFILE_LABELS[activeProfile]} {index + 1}
-            </span>
+        <div className="profile-tabs" aria-label="Destination category">
+          {PROFILES.map((profile) => (
             <button
+              key={profile}
               type="button"
-              aria-label={`Remove ${PROFILE_LABELS[activeProfile].toLowerCase()} ${index + 1}`}
-              onClick={() => onRemoveLocation(activeProfile, index)}
+              className={profile === activeProfile ? "active" : ""}
+              onClick={() => onActiveProfileChange(profile)}
             >
-              Remove
+              <span className="profile-name">
+                <span
+                  className={`location-swatch ${PROFILE_SWATCHES[profile]}`}
+                  aria-hidden="true"
+                />
+                {PROFILE_LABELS[profile]}
+              </span>
+              <span>{locations[profile].length}</span>
             </button>
-            <span className="coordinates">
-              {location.lat.toFixed(3)}, {location.lon.toFixed(3)}
-            </span>
-          </div>
-        ))}
+          ))}
+        </div>
+        <p className="category-limit">
+          {locations[activeProfile].length}/{maxLocations}{" "}
+          {PROFILE_LABELS[activeProfile].toLowerCase()} destinations
+        </p>
+        {PROFILES.some((profile) => locations[profile].length === 0) && (
+          <p className="calculation-hint">
+            Add one destination to each category to calculate the heatmap.
+          </p>
+        )}
+        <div className="location-list">
+          {locations[activeProfile].map((location, index) => (
+            <div key={`${activeProfile}-${index}`} className="location-row">
+              <span className="location-name">
+                <span
+                  className={`location-swatch ${PROFILE_SWATCHES[activeProfile]}`}
+                  aria-hidden="true"
+                />
+                {PROFILE_LABELS[activeProfile]} {index + 1}
+              </span>
+              <button
+                type="button"
+                aria-label={`Remove ${PROFILE_LABELS[activeProfile].toLowerCase()} ${index + 1}`}
+                onClick={() => onRemoveLocation(activeProfile, index)}
+              >
+                Remove
+              </button>
+              <span className="coordinates">
+                {location.lat.toFixed(3)}, {location.lon.toFixed(3)}
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
       <label className="weight-slider">
         <span>Traveler patience</span>
