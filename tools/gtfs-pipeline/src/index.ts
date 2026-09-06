@@ -10,6 +10,7 @@ import {
   PROFILES,
 } from "./gtfs/headways.js";
 import { buildGrid } from "./gtfs/grid.js";
+import { WaterIndex } from "./gtfs/water.js";
 
 const dataDir = path.resolve(
   import.meta.dirname,
@@ -91,7 +92,9 @@ async function main() {
   await writeFile(path.join(outDir, "stops.json"), JSON.stringify(stopsOut));
 
   console.log("building spatial grid + walk candidates...");
-  const { cells, resolution, edgeMeters } = buildGrid(bbox, stopsOut);
+  console.log("loading water tiles (excludes open-sea cells)...");
+  const waterIndex = await WaterIndex.load(bbox);
+  const { cells, resolution, edgeMeters } = buildGrid(bbox, stopsOut, waterIndex);
   console.log(
     `grid: resolution ${resolution} (avg edge ~${edgeMeters.toFixed(0)}m), ` +
       `${cells.length} populated cells`,

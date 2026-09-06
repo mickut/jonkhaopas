@@ -65,6 +65,19 @@ test("buildGrid excludes cells far out in open sea even when the raw bbox extend
   );
 });
 
+test("buildGrid excludes a cell that a WaterIndex reports as open water, even right next to a stop", () => {
+  const stops: GridStop[] = [
+    { id: "near", lat: 60.17, lon: 24.94, headway: [5, 5, 5] },
+  ];
+  const allWater = { isWater: () => true };
+  const { cells } = buildGrid(tinyBbox, stops, allWater);
+  assert.equal(
+    cells.length,
+    0,
+    "swimming isn't a transport strategy — no cell should ship if it's water, regardless of nearby service",
+  );
+});
+
 test("buildGrid finds an in-range stop offset mostly east-west, not just north-south", () => {
   // At HSL's ~60N latitude, longitude degrees are ~half as wide in real distance as latitude
   // degrees (compressed by cos(lat)) — a spatial bucket sized for latitude alone silently drops

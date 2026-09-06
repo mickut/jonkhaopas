@@ -2,6 +2,8 @@ import * as h3 from "h3-js";
 import type { Bbox } from "./stops.js";
 import { PROFILES } from "./headways.js";
 
+export type WaterIndex = { isWater(lat: number, lon: number): boolean };
+
 const TARGET_EDGE_METERS = 250;
 /** Hard cap on total cell count so grid.json stays a "low single-digit MB" client fetch. */
 const MAX_CELLS = 40_000;
@@ -176,6 +178,7 @@ function pickCandidates(
 export function buildGrid(
   bbox: Bbox,
   stops: GridStop[],
+  waterIndex?: WaterIndex,
 ): { cells: GridCell[]; resolution: number; edgeMeters: number } {
   const resolution = pickResolution(bbox);
   const edgeMeters = h3.getHexagonEdgeLengthAvg(resolution, "m");
@@ -185,15 +188,17 @@ export function buildGrid(
   const cells: GridCell[] = [];
   for (const cell of h3cells) {
     const [lat, lon] = h3.cellToLatLng(cell);
+    // A cell that's literally open water is never worth scoring, no matter how close a stop is —
+    // swimming isn't a transport strategy. Checked first since it's the cheapest test and rules
+    // out most of the raw bbox rectangle's open-sea area up front (see stops.ts computeBbox).
+    if (waterIndex?.isWater(lat, lon)) continue;
     const pool = index.nearby(lat, lon, MAX_WALK_KM, CANDIDATE_POOL_SIZE);
-    // Ship the cell even with an empty candidate list (e.g. open water between the mainland and
-    // an outer island) — the frontend's cost.ts walks further to reach real service or straight
-    // to the destination in that case, producing a smooth, proportional cost. Used to skip these
-    // cells entirely ("permanently unreachable, not worth shipping"), but that left real gaps in
-    // the rendered grid exactly where a gradual transition was needed. But skip cells beyond
-    // CELL_INCLUSION_BUFFER_KM of every stop — the bbox rectangle can extend tens of km into open
-    // sea past the outermost archipelago stop, and shipping those cells just to render them gray
-    // isn't a transition, it's empty ocean.
+    // Ship the cell even with an empty candidate list (e.g. a land cell between the nearest
+    // walkable stop and an outer island) — the frontend's cost.ts walks further to reach real
+    // service or straight to the destination in that case, producing a smooth, proportional cost.
+    // Used to skip these cells entirely ("permanently unreachable, not worth shipping"), but that
+    // left real gaps in the rendered grid exactly where a gradual transition was needed. But skip
+    // cells beyond CELL_INCLUSION_BUFFER_KM of every stop — not worth shipping just to render gray.
     const nearAnyStop =
       pool.length > 0 ||
       index.nearby(lat, lon, CELL_INCLUSION_BUFFER_KM, 1).length > 0;

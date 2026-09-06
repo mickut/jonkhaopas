@@ -8,6 +8,10 @@ dist-ssr/
 # to the client, and not worth tracking in git; re-download from HSL's open data portal instead.
 /data/hsl/
 
+# Water vector tiles, cached by tools/gtfs-pipeline/src/gtfs/water.ts on first pipeline run —
+# fetched from OpenFreeMap (CC BY / ODbL, same source as the basemap), not worth tracking in git.
+/data/water-tiles/
+
 # Editor directories and files
 .idea
 .DS_Store
