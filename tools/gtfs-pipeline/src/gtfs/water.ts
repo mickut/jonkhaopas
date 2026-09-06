@@ -1,8 +1,9 @@
-// Excludes grid cells whose center is open water, per OpenFreeMap's own "water" vector-tile
-// layer — the same OpenMapTiles-schema data already rendering the (verifiably accurate, down to
+// Excludes grid cells whose center is open sea, per OpenFreeMap's own "water" vector-tile layer
+// — the same OpenMapTiles-schema data already rendering the (verifiably accurate, down to
 // individual archipelago skerries) basemap coastline. A coarser dataset like Natural Earth's
 // public-domain land polygons was tried first, but at continental-scale generalization it drops
 // most of Helsinki's small skerries entirely, so it couldn't tell real land from open sea here.
+// Only the "ocean" class is kept as exclusion-worthy water — see WaterIndex.load below.
 import { VectorTile } from "@mapbox/vector-tile";
 import { PbfReader } from "pbf";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -114,7 +115,12 @@ export class WaterIndex {
       if (!layer) return;
       const polygons: PolygonWithHoles[] = [];
       for (let i = 0; i < layer.length; i++) {
-        const feature = layer.feature(i).toGeoJSON(x, y, ZOOM);
+        const rawFeature = layer.feature(i);
+        // Only "ocean" (OpenMapTiles' class for real sea/coastal water) excludes a cell — small
+        // inland water (river/pond/lake/dock/swimming_pool) shouldn't punch a hole in an
+        // otherwise well-connected block; walking around a pond is trivial, unlike open sea.
+        if (rawFeature.properties["class"] !== "ocean") continue;
+        const feature = rawFeature.toGeoJSON(x, y, ZOOM);
         const geometry = feature.geometry;
         if (geometry.type === "Polygon") {
           polygons.push(geometry.coordinates as PolygonWithHoles);
