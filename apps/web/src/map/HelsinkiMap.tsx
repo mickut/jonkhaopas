@@ -30,8 +30,13 @@ import type { GridCell, Profile } from "../data/types.js";
 // Vite's production build doesn't emit maplibre-gl's worker chunk on its own (only dev serving
 // node_modules directly makes the default self-derived worker URL work), and a Vite `?url` copy
 // would break the worker's own relative import of its sibling maplibre-gl-shared.mjs — so both
-// files are copied as-is into public/ by scripts/copy-maplibre-assets.mjs (postinstall).
-setWorkerUrl(`${import.meta.env.BASE_URL}maplibre/maplibre-gl-worker.mjs`);
+// files are copied as-is into public/ by scripts/copy-maplibre-assets.mjs (postinstall). Dev mode
+// must keep using maplibre-gl's own default worker resolution: it pairs its "-dev" library build
+// with matching "-dev" worker/shared files internally, and forcing the plain production copies
+// here mismatches that pairing, silently breaking tile rendering with no console error.
+if (import.meta.env.PROD) {
+  setWorkerUrl(`${import.meta.env.BASE_URL}maplibre/maplibre-gl-worker.mjs`);
+}
 
 const HELSINKI_CENTER: [number, number] = [24.9384, 60.1699];
 const STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";

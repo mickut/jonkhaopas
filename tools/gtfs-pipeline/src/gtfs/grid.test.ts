@@ -11,7 +11,7 @@ const tinyBbox: Bbox = {
   maxLon: 24.98,
 };
 
-test("buildGrid assigns the nearest stop first and omits cells with no reachable stop", () => {
+test("buildGrid assigns the nearest stop first, for cells that have one in range", () => {
   const stops: GridStop[] = [
     { id: "near", lat: 60.17, lon: 24.94, headway: [5, 5, 5] },
     { id: "far", lat: 61.5, lon: 26.5, headway: [5, 5, 5] }, // far outside the bbox, never a candidate
@@ -23,7 +23,9 @@ test("buildGrid assigns the nearest stop first and omits cells with no reachable
   assert.ok(edgeMeters > 0);
 
   for (const cell of cells) {
-    assert.ok(cell.stops.length > 0);
+    // Cells beyond the walk radius but within the inclusion buffer are still shipped (with an
+    // empty candidate list) for smooth degradation near real coastlines/islands — see buildGrid.
+    if (cell.stops.length === 0) continue;
     const [nearestIndex, walkMinutes] = cell.stops[0]!;
     assert.equal(
       nearestIndex,
@@ -34,12 +36,33 @@ test("buildGrid assigns the nearest stop first and omits cells with no reachable
   }
 });
 
-test("buildGrid produces no cells when no stop is within walking range", () => {
+test("buildGrid produces no cells when no stop is within the inclusion buffer", () => {
   const stops: GridStop[] = [
     { id: "far", lat: 61.5, lon: 26.5, headway: [5, 5, 5] },
   ];
   const { cells } = buildGrid(tinyBbox, stops);
   assert.equal(cells.length, 0);
+});
+
+test("buildGrid excludes cells far out in open sea even when the raw bbox extends that far", () => {
+  // A single distant outlier stop (e.g. a remote archipelago ferry stop) makes computeBbox's
+  // rectangle span a lot of empty sea between it and the rest of the network — buildGrid must
+  // not ship every cell in that rectangle just because it's technically within the bbox.
+  const wideBbox: Bbox = { minLat: 60.1, maxLat: 60.5, minLon: 24.9, maxLon: 25.5 };
+  const stops: GridStop[] = [
+    { id: "mainland", lat: 60.17, lon: 24.94, headway: [5, 5, 5] },
+    { id: "remote-outlier", lat: 60.5, lon: 25.5, headway: [5, 5, 5] },
+  ];
+  const { cells } = buildGrid(wideBbox, stops);
+  const midSeaCell = cells.find(
+    (cell) =>
+      Math.abs(cell.lat - 60.33) < 0.02 && Math.abs(cell.lon - 25.2) < 0.02,
+  );
+  assert.equal(
+    midSeaCell,
+    undefined,
+    "a cell roughly midway between the two far-apart stops should be excluded, not shipped empty",
+  );
 });
 
 test("buildGrid finds an in-range stop offset mostly east-west, not just north-south", () => {

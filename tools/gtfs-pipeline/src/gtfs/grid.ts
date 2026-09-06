@@ -8,6 +8,11 @@ const MAX_CELLS = 40_000;
 const WALK_SPEED_KMH = 4.8;
 const MAX_WALK_MINUTES = 25;
 const MAX_WALK_KM = (WALK_SPEED_KMH * MAX_WALK_MINUTES) / 60;
+/** Cells farther than this from every stop are skipped entirely, even though the raw bbox (see
+ * stops.ts computeBbox) is a rectangle over the full HSL stop distribution and can span open sea
+ * far beyond any real coastline or island. Bigger than MAX_WALK_KM so real coastal/archipelago
+ * transitions still degrade smoothly (see the empty-candidate-list comment in buildGrid below). */
+const CELL_INCLUSION_BUFFER_KM = MAX_WALK_KM * 2;
 /** Search pool before profile-aware selection narrows it down (see pickCandidates). */
 const CANDIDATE_POOL_SIZE = 60;
 /** How many purely-nearest-overall stops to always keep, regardless of profile service. */
@@ -181,13 +186,18 @@ export function buildGrid(
   for (const cell of h3cells) {
     const [lat, lon] = h3.cellToLatLng(cell);
     const pool = index.nearby(lat, lon, MAX_WALK_KM, CANDIDATE_POOL_SIZE);
-    // Always ship the cell, even with an empty candidate list (e.g. open water between the
-    // mainland and an outer island) — the frontend's cost.ts walks further to reach real service
-    // or straight to the destination in that case, producing a smooth, proportional cost. Used
-    // to skip these cells entirely ("permanently unreachable, not worth shipping"), but that left
-    // real gaps in the rendered grid exactly where a gradual transition was needed, making a
-    // scored island look like it sat directly against a scored mainland cell with nothing (not
-    // even a "we have no data here" gap) in between.
+    // Ship the cell even with an empty candidate list (e.g. open water between the mainland and
+    // an outer island) — the frontend's cost.ts walks further to reach real service or straight
+    // to the destination in that case, producing a smooth, proportional cost. Used to skip these
+    // cells entirely ("permanently unreachable, not worth shipping"), but that left real gaps in
+    // the rendered grid exactly where a gradual transition was needed. But skip cells beyond
+    // CELL_INCLUSION_BUFFER_KM of every stop — the bbox rectangle can extend tens of km into open
+    // sea past the outermost archipelago stop, and shipping those cells just to render them gray
+    // isn't a transition, it's empty ocean.
+    const nearAnyStop =
+      pool.length > 0 ||
+      index.nearby(lat, lon, CELL_INCLUSION_BUFFER_KM, 1).length > 0;
+    if (!nearAnyStop) continue;
     const nearby = pool.length > 0 ? pickCandidates(pool, stops) : [];
     const stopsForCell: [number, number][] = nearby.map(
       ([stopIndex, distanceKm]) => [
