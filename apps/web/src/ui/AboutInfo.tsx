@@ -50,9 +50,10 @@ export function AboutInfo() {
             planner, "Reittiopas".
           </p>
           <p>
-            The original version was developed in 2002-2003 by the author while
-            figuring out where to live next, (mis)using YTV's (HSL's
-            predecessor) REST API to calculate travel times.
+            The original version was developed in the early-to-mid 2000s
+            (2002-2006) by the author while figuring out where to live next,
+            (mis)using YTV's (HSL's predecessor) REST API to calculate travel
+            times.
           </p>
           <p>
             This version instead uses HSL's Open Data GTFS feed, pre-processed
@@ -62,6 +63,17 @@ export function AboutInfo() {
             Pick at least one spot each for work, evenings, and weekend targets,
             and the map scores every location by how well public transport
             serves your needs.
+          </p>
+          <p>
+            © 2026 Antti Kuntsi. Code and this app are licensed under{" "}
+            <a
+              href="https://creativecommons.org/licenses/by/4.0/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              CC BY 4.0
+            </a>
+            .
           </p>
           <button
             type="button"

@@ -42,6 +42,10 @@
   margin: 0 0 8px;
 }
 
+.about-info-popover a {
+  color: #6cb2eb;
+}
+
 .about-info-popover p:last-of-type {
   margin-bottom: 10px;
 }

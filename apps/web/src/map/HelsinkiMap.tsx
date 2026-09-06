@@ -107,7 +107,7 @@ export function HelsinkiMap() {
     map.addControl(
       new AttributionControl({
         customAttribution:
-          '<a href="https://www.hsl.fi/en/hsl/open-data" target="_blank" rel="noopener noreferrer">HSL GTFS</a> (CC BY 4.0)',
+          '© 2026 Antti Kuntsi (CC BY 4.0) · <a href="https://www.hsl.fi/en/hsl/open-data" target="_blank" rel="noopener noreferrer">HSL GTFS</a> (CC BY 4.0)',
       }),
       "bottom-right",
     );
