@@ -1,0 +1,60 @@
+name: Build and deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    # Weekly refresh of the HSL GTFS feed, independent of code changes.
+    - cron: "17 3 * * 1"
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Fetch HSL GTFS feed
+        run: |
+          mkdir -p data/hsl
+          curl -sSL https://dev.hsl.fi/gtfs/hsl.zip -o /tmp/hsl.zip
+          unzip -o /tmp/hsl.zip -d data/hsl
+
+      - name: Build GTFS -> static data artifacts
+        working-directory: tools/gtfs-pipeline
+        run: |
+          npm ci
+          npm run build:data
+
+      - name: Build SPA
+        working-directory: apps/web
+        run: |
+          npm ci
+          npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/web/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

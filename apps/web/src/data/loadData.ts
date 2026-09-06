@@ -6,14 +6,15 @@ async function fetchJson<T>(path: string): Promise<T> {
   return (await res.json()) as T;
 }
 
+// BASE_URL accounts for GitHub Pages serving this as a project site under /jonkhaopas/.
 export function loadStops(): Promise<Stop[]> {
-  return fetchJson<Stop[]>("/data/stops.json");
+  return fetchJson<Stop[]>(`${import.meta.env.BASE_URL}data/stops.json`);
 }
 
 export function loadGrid(): Promise<GridCell[]> {
-  return fetchJson<GridCell[]>("/data/grid.json");
+  return fetchJson<GridCell[]>(`${import.meta.env.BASE_URL}data/grid.json`);
 }
 
 export function loadMeta(): Promise<Meta> {
-  return fetchJson<Meta>("/data/meta.json");
+  return fetchJson<Meta>(`${import.meta.env.BASE_URL}data/meta.json`);
 }
