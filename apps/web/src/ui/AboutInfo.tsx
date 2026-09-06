@@ -1,15 +1,18 @@
 import { useState } from "react";
+import { LOCALES } from "../i18n/translations.js";
+import { useTranslation } from "../i18n/LocaleContext.js";
 import "./AboutInfo.css";
 
 export function AboutInfo() {
   const [open, setOpen] = useState(false);
+  const { locale, setLocale, t } = useTranslation();
 
   return (
     <div className="about-info">
       <button
         type="button"
         className="about-info-toggle"
-        aria-label="About Jonkhaopas"
+        aria-label={t.about.toggleAria}
         aria-expanded={open}
         onClick={() => setOpen((prev) => !prev)}
       >
@@ -42,45 +45,43 @@ export function AboutInfo() {
         <div
           className="about-info-popover"
           role="dialog"
-          aria-label="About Jonkhaopas"
+          aria-label={t.about.toggleAria}
         >
+          <div className="about-info-locale-switch" role="group" aria-label="Language">
+            {LOCALES.map((code) => (
+              <button
+                key={code}
+                type="button"
+                className={code === locale ? "active" : ""}
+                onClick={() => setLocale(code)}
+              >
+                {code.toUpperCase()}
+              </button>
+            ))}
+          </div>
           <p>
-            <strong>Jonkhaopas</strong> ("Middle-of-nowhere guide") is a
-            tongue-in-cheek take on Helsingin seudun liikenne's official journey
-            planner, "Reittiopas".
+            <strong>Jonkhaopas</strong> {t.about.intro}
           </p>
+          <p>{t.about.history}</p>
+          <p>{t.about.dataSource}</p>
+          <p>{t.about.instructions}</p>
           <p>
-            The original version was developed in the early-to-mid 2000s
-            (2002-2006) by the author while figuring out where to live next,
-            (mis)using YTV's (HSL's predecessor) REST API to calculate travel
-            times.
-          </p>
-          <p>
-            This version instead uses HSL's Open Data GTFS feed, pre-processed
-            offline so the map stays responsive.
-          </p>
-          <p>
-            Pick at least one spot each for work, evenings, and weekend targets,
-            and the map scores every location by how well public transport
-            serves your needs.
-          </p>
-          <p>
-            © 2026 Antti Kuntsi. Code and this app are licensed under{" "}
+            {t.about.copyrightPrefix}
             <a
               href="https://creativecommons.org/licenses/by/4.0/"
               target="_blank"
               rel="noopener noreferrer"
             >
-              CC BY 4.0
+              {t.about.copyrightLicenseName}
             </a>
-            .
+            {t.about.copyrightSuffix}
           </p>
           <button
             type="button"
             className="about-info-close"
             onClick={() => setOpen(false)}
           >
-            Close
+            {t.about.close}
           </button>
         </div>
       )}

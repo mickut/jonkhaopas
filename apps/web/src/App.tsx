@@ -1,10 +1,13 @@
 import { HelsinkiMap } from "./map/HelsinkiMap";
+import { LocaleProvider } from "./i18n/LocaleContext.js";
 
 function App() {
   return (
-    <div className="app-shell">
-      <HelsinkiMap />
-    </div>
+    <LocaleProvider>
+      <div className="app-shell">
+        <HelsinkiMap />
+      </div>
+    </LocaleProvider>
   );
 }
 

@@ -42,6 +42,28 @@
   margin: 0 0 8px;
 }
 
+.about-info-locale-switch {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 10px;
+}
+
+.about-info-locale-switch button {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.04);
+  color: #dfe3e8;
+  font-size: 11px;
+  padding: 3px 6px;
+  cursor: pointer;
+}
+
+.about-info-locale-switch button.active {
+  border-color: #4fc3f7;
+  background: rgba(79, 195, 247, 0.16);
+}
+
 .about-info-popover a {
   color: #6cb2eb;
 }
