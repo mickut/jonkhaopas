@@ -35,10 +35,12 @@ export type JonkhakerroinState = {
   ready: boolean;
   locations: ProfileLocations;
   activeProfile: Profile;
+  isPicking: boolean;
   patience: number;
   scores: Float64Array | null;
   profileCosts: Float64Array | null;
   setActiveProfile: (profile: Profile) => void;
+  setPicking: (isPicking: boolean) => void;
   addLocation: (profile: Profile, location: Location) => void;
   removeLocation: (profile: Profile, index: number) => void;
   updateLocation: (profile: Profile, index: number, location: Location) => void;
@@ -54,6 +56,7 @@ export function useJonkhakerroin(): JonkhakerroinState {
     DEFAULT_PROFILE_LOCATIONS,
   );
   const [activeProfile, setActiveProfile] = useState<Profile>("work");
+  const [isPicking, setIsPicking] = useState(true);
   const [patience, setPatience] = useState<number>(DEFAULT_PATIENCE);
   const [scores, setScores] = useState<Float64Array | null>(null);
   const [profileCosts, setProfileCosts] = useState<Float64Array | null>(null);
@@ -176,6 +179,11 @@ export function useJonkhakerroin(): JonkhakerroinState {
 
   const setActiveProfileValue = useCallback((profile: Profile) => {
     setActiveProfile(profile);
+    setIsPicking(true);
+  }, []);
+
+  const setPickingValue = useCallback((value: boolean) => {
+    setIsPicking(value);
   }, []);
 
   const setPatienceValue = useCallback((value: number) => {
@@ -189,10 +197,12 @@ export function useJonkhakerroin(): JonkhakerroinState {
       ready,
       locations,
       activeProfile,
+      isPicking,
       patience,
       scores,
       profileCosts,
       setActiveProfile: setActiveProfileValue,
+      setPicking: setPickingValue,
       addLocation,
       removeLocation,
       updateLocation,
@@ -204,7 +214,9 @@ export function useJonkhakerroin(): JonkhakerroinState {
       ready,
       locations,
       activeProfile,
+      isPicking,
       setActiveProfileValue,
+      setPickingValue,
       patience,
       scores,
       profileCosts,

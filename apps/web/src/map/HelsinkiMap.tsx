@@ -106,13 +106,23 @@ export function HelsinkiMap() {
     map.addControl(new NavigationControl(), "top-right");
     map.addControl(
       new AttributionControl({
+        compact: true,
         customAttribution:
           '© 2026 Antti Kuntsi (CC BY 4.0) · <a href="https://www.hsl.fi/en/hsl/open-data" target="_blank" rel="noopener noreferrer">HSL GTFS</a> (CC BY 4.0)',
       }),
       "bottom-right",
     );
+    const closeMobileAttribution = () => {
+      if (!window.matchMedia("(max-width: 600px)").matches) return;
+      const attribution = map
+        .getContainer()
+        .querySelector<HTMLElement>(".maplibregl-ctrl-attrib");
+      attribution?.removeAttribute("open");
+      attribution?.classList.remove("maplibregl-compact-show");
+    };
 
     map.on("load", () => {
+      closeMobileAttribution();
       setMapReady(true);
       map.addSource(GRID_SOURCE_ID, {
         type: "geojson",
@@ -132,9 +142,10 @@ export function HelsinkiMap() {
         paint: FILL_PAINT,
       });
 
-      map.on("mousemove", GRID_FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
-        const feature = e.features?.[0];
-        if (!feature) return;
+      const showScorePopup = (
+        feature: { properties?: Record<string, unknown> },
+        lngLat: MapMouseEvent["lngLat"],
+      ) => {
         const rawScoreProperty = feature.properties?.["rawScore"];
         const logScoreProperty = feature.properties?.["score"];
         const score = Number(rawScoreProperty ?? NaN);
@@ -155,9 +166,15 @@ export function HelsinkiMap() {
           });
         }
         popupRef.current
-          .setLngLat(e.lngLat)
+          .setLngLat(lngLat)
           .setHTML(`<strong>${displayScore}</strong>`)
           .addTo(map);
+      };
+
+      map.on("mousemove", GRID_FILL_LAYER_ID, (e: MapLayerMouseEvent) => {
+        const feature = e.features?.[0];
+        if (!feature) return;
+        showScorePopup(feature, e.lngLat);
       });
       map.on("mouseleave", GRID_FILL_LAYER_ID, () => {
         popupRef.current?.remove();
@@ -168,6 +185,10 @@ export function HelsinkiMap() {
           layers: [GRID_FILL_LAYER_ID],
         });
         if (features.length === 0) return;
+        if (!stateRef.current.isPicking) {
+          showScorePopup(features[0]!, e.lngLat);
+          return;
+        }
         stateRef.current.addLocation(stateRef.current.activeProfile, {
           lat: e.lngLat.lat,
           lon: e.lngLat.lng,
@@ -254,7 +275,9 @@ export function HelsinkiMap() {
         onPatienceChange={state.setPatience}
         locations={state.locations}
         activeProfile={state.activeProfile}
+        isPicking={state.isPicking}
         onActiveProfileChange={state.setActiveProfile}
+        onPickingChange={state.setPicking}
         onRemoveLocation={state.removeLocation}
         maxLocations={MAX_LOCATIONS}
       />

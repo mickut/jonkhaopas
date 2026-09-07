@@ -3,6 +3,7 @@ import {
   type Profile,
   type ProfileLocations,
 } from "../data/types.js";
+import { useState } from "react";
 import { AboutInfo } from "./AboutInfo.js";
 import { useTranslation } from "../i18n/LocaleContext.js";
 import "./WeightControls.css";
@@ -18,7 +19,9 @@ type WeightControlsProps = {
   onPatienceChange: (value: number) => void;
   locations: ProfileLocations;
   activeProfile: Profile;
+  isPicking: boolean;
   onActiveProfileChange: (profile: Profile) => void;
+  onPickingChange: (isPicking: boolean) => void;
   onRemoveLocation: (profile: Profile, index: number) => void;
   maxLocations: number;
 };
@@ -28,27 +31,50 @@ export function WeightControls({
   onPatienceChange,
   locations,
   activeProfile,
+  isPicking,
   onActiveProfileChange,
+  onPickingChange,
   onRemoveLocation,
   maxLocations,
 }: WeightControlsProps) {
   const { t } = useTranslation();
   const profileLabels = t.profile;
+  const [isExpanded, setIsExpanded] = useState(true);
+
   return (
-    <div className="panel weight-controls">
+    <div className={`panel weight-controls${isExpanded ? "" : " collapsed"}`}>
       <div className="weight-controls-header">
-        <h2>Jonkhaopas</h2>
+        <button
+          type="button"
+          className="weight-controls-toggle"
+          aria-expanded={isExpanded}
+          aria-controls="weight-controls-content"
+          onClick={() => setIsExpanded((expanded) => !expanded)}
+        >
+          <h2>Jonkhaopas</h2>
+          <span aria-hidden="true">{isExpanded ? "−" : "+"}</span>
+        </button>
         <AboutInfo />
       </div>
-      <div className="weight-controls-scroll">
-        <p className="hint">{t.header.hint}</p>
+      <div id="weight-controls-content" className="weight-controls-content">
+        <div className="weight-controls-scroll">
+          <p className="hint">
+            {isPicking ? t.header.hint : t.header.inspectHint}
+          </p>
         <div className="profile-tabs" aria-label="Destination category">
           {PROFILES.map((profile) => (
             <button
               key={profile}
               type="button"
-              className={profile === activeProfile ? "active" : ""}
-              onClick={() => onActiveProfileChange(profile)}
+              className={profile === activeProfile && isPicking ? "active" : ""}
+              aria-pressed={profile === activeProfile && isPicking}
+              onClick={() => {
+                if (profile === activeProfile) {
+                  onPickingChange(!isPicking);
+                } else {
+                  onActiveProfileChange(profile);
+                }
+              }}
             >
               <span className="profile-name">
                 <span
@@ -60,6 +86,7 @@ export function WeightControls({
               <span>{locations[profile].length}</span>
             </button>
           ))}
+        </div>
         </div>
         <p className="category-limit">
           {t.weightControls.categoryLimit(
@@ -97,18 +124,18 @@ export function WeightControls({
             </div>
           ))}
         </div>
+        <label className="weight-slider">
+          <span>{t.header.patience}</span>
+          <input
+            type="range"
+            min={0}
+            max={1}
+            step={0.01}
+            value={patience}
+            onChange={(e) => onPatienceChange(Number(e.target.value))}
+          />
+        </label>
       </div>
-      <label className="weight-slider">
-        <span>{t.header.patience}</span>
-        <input
-          type="range"
-          min={0}
-          max={1}
-          step={0.01}
-          value={patience}
-          onChange={(e) => onPatienceChange(Number(e.target.value))}
-        />
-      </label>
     </div>
   );
 }
