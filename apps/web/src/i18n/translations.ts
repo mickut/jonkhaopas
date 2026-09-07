@@ -3,7 +3,12 @@ export const LOCALES: Locale[] = ["en", "fi"];
 export const DEFAULT_LOCALE: Locale = "en";
 
 export type Translations = {
-  header: { hint: string; inspectHint: string; patience: string };
+  header: {
+    hint: string;
+    inspectHint: string;
+    inspectMode: string;
+    patience: string;
+  };
   profile: { work: string; weekdayEvening: string; weekend: string };
   weightControls: {
     categoryLimit: (count: number, max: number, profileLabel: string) => string;
@@ -30,12 +35,13 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     header: {
       hint: "Choose a category, then click the map to add its destinations. Drag a pin to move it.",
       inspectHint: "Tap the map to inspect a score. Select a category to add a destination.",
+      inspectMode: "Inspect score",
       patience: "Traveler patience",
     },
     profile: {
-      work: "Work spot",
-      weekdayEvening: "Weekday evening stop",
-      weekend: "Weekend spot",
+      work: "Work",
+      weekdayEvening: "Evening",
+      weekend: "Weekend",
     },
     weightControls: {
       categoryLimit: (count, max, profileLabel) =>
@@ -67,6 +73,7 @@ export const TRANSLATIONS: Record<Locale, Translations> = {
     header: {
       hint: "Valitse kategoria ja lisää sen kohteita napauttamalla karttaa. Siirrä nastaa vetämällä.",
       inspectHint: "Napauta karttaa nähdäksesi pistemäärän. Valitse kategoria lisätäksesi kohteen.",
+      inspectMode: "Pistemäärän tarkistus",
       patience: "Matkustajan kärsivällisyys",
     },
     profile: {

@@ -40,6 +40,9 @@ export function WeightControls({
   const { t } = useTranslation();
   const profileLabels = t.profile;
   const [isExpanded, setIsExpanded] = useState(true);
+  const modeLabel = isPicking
+    ? profileLabels[activeProfile]
+    : t.header.inspectMode;
 
   return (
     <div className={`panel weight-controls${isExpanded ? "" : " collapsed"}`}>
@@ -52,7 +55,20 @@ export function WeightControls({
           onClick={() => setIsExpanded((expanded) => !expanded)}
         >
           <h2>Jonkhaopas</h2>
-          <span aria-hidden="true">{isExpanded ? "−" : "+"}</span>
+          {!isExpanded && (
+            <span className="weight-controls-mode">
+              {isPicking && (
+                <span
+                  className={`location-swatch ${PROFILE_SWATCHES[activeProfile]}`}
+                  aria-hidden="true"
+                />
+              )}
+              {modeLabel}
+            </span>
+          )}
+          <span className="weight-controls-icon" aria-hidden="true">
+            {isExpanded ? "−" : "+"}
+          </span>
         </button>
         <AboutInfo />
       </div>

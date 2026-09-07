@@ -48,10 +48,24 @@
   cursor: pointer;
 }
 
-.weight-controls-toggle span {
+.weight-controls-icon {
   color: #a9b0b8;
   font-size: 16px;
   line-height: 1;
+}
+
+.weight-controls-mode {
+  display: none;
+  align-items: center;
+  gap: 5px;
+  color: #a9b0b8;
+  font-size: 11px;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.weight-controls.collapsed .weight-controls-mode {
+  display: inline-flex;
 }
 
 .weight-controls-toggle:focus-visible {
